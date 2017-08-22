@@ -1,0 +1,54 @@
+---
+title: 'Statistical Inference course project02'
+output: pdf_document
+author: Fan Ouyang
+---
+## Overview
+This is an analysis of the ToothGrowth data in the R datasets package.
+### Load the ToothGrowth data and perform some basic exploratory data analyses
+```{r}
+library(datasets)
+data(ToothGrowth)
+```
+### Provide a basic summary of the data.
+```{r}
+summary(ToothGrowth)
+```
+### exploratory analysis of data.
+```{r}
+library(ggplot2)
+ToothGrowth$dose<-as.factor(ToothGrowth$dose)
+par(mfrow=c(1,2))
+ggplot(aes(x=dose, y=len), data=ToothGrowth) + geom_boxplot(aes(fill=dose)) + xlab("Dose Amount") + ylab("Tooth Length") + facet_grid(~ supp) + ggtitle("Tooth Length vs. Dose Amount \nby Delivery Method") + theme(plot.title = element_text(lineheight=.8, face="bold"))
+
+ggplot(aes(x=supp, y=len), data=ToothGrowth) + geom_boxplot(aes(fill=supp)) + xlab("Supplement Delivery") + ylab("Tooth Length") + facet_grid(~ dose) + ggtitle("Tooth Length vs. Delivery Method \nby Dose Amount") + theme(plot.title = element_text(lineheight=.8, face="bold"))
+```
+
+### Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. 
+compare tooth growth by supplement using a t-test. The p-value of this test was 0.06.
+Since the p-value is greater than 0.05, we could conclude that supplement types seems to have no impact on Tooth growth based on this test.
+```{r}
+t.test(len~supp,data=ToothGrowth)
+```
+compare tooth growth by dose, looking at the different pairs of dose values.
+As can be seen, the p-value of each test was essentially zero and the confidence interval of each test does not cross over zero (0). Based on this result we can assume that the average tooth length increases with an inceasing dose, and the null hypothesis can be rejected.
+```{r}
+# run t-test using dose amounts 0.5 and 1.0
+ToothGrowth_sub <- subset(ToothGrowth, ToothGrowth$dose %in% c(1.0,0.5))
+t.test(len~dose,data=ToothGrowth_sub)
+# run t-test using dose amounts 0.5 and 2.0
+ToothGrowth_sub <- subset(ToothGrowth, ToothGrowth$dose %in% c(0.5,2.0))
+t.test(len~dose,data=ToothGrowth_sub)
+# run t-test using dose amounts 1.0 and 2.0
+ToothGrowth_sub <- subset(ToothGrowth, ToothGrowth$dose %in% c(1.0,2.0))
+t.test(len~dose,data=ToothGrowth_sub)
+```
+### Conclusions and the assumptions needed for conclusions.
+Conclusions
+1. Supplement type has no effect on tooth growth.
+2. Increasing the dose level leads to increased tooth growth.
+
+Given the following assumptions:
+1. The sample is representative of the population
+2. The distribution of the sample means follows the Central Limit Theorem
+3. In reviewing our t-test analysis from above, we can conclude that supplement delivery method has no effect on tooth growth/length, however increased dosages do result in increased tooth length.
